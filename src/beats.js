@@ -1,167 +1,150 @@
 import * as Tone from "https://cdn.skypack.dev/tone@15.1.22";
 import { bassPatterns, acidPatterns, kickPatterns, drumPatterns } from "./patterns/index.js";
+import { CONFIG, muteAllAndClear } from "./config.js";
+import { TESTING, setupTestPatterns } from "./testing.js";
 
 export class BeatManager {
   constructor(synthsAndSequences) {
     this.synths = synthsAndSequences;
+    this.activeTimeouts = [];
+    this.maxLoopPerSection = new Map();
   }
 
-  updateProgression(section) {
-    const { bassSeq, acidSeq, kickSeq, snareSeq, percSeq, techLeadSeq, techStabSeq, bassGain, kickGain, hatGain, acidGain, buildupGain, buildupNoise, buildupFilter, acid, bass, drumsMixer } = this.synths;
+  clearTimeouts() {
+    this.activeTimeouts.forEach((timeout) => clearTimeout(timeout));
+    this.activeTimeouts = [];
+  }
+
+  loop(loopNumbers, callback) {
+    const loops = Array.isArray(loopNumbers) ? loopNumbers : [loopNumbers];
+
+    loops.forEach((loopNumber) => {
+      const delay = (loopNumber - 1) * 1875;
+      const timeout = setTimeout(() => {
+        callback(loopNumber);
+      }, delay);
+      this.activeTimeouts.push(timeout);
+    });
+
+    const maxLoop = Math.max(...loops);
+    const currentMax = this.maxLoopPerSection.get(this.currentSection) || 0;
+    this.maxLoopPerSection.set(this.currentSection, Math.max(currentMax, maxLoop));
+  }
+
+  getSectionLength(sectionIndex) {
+    return this.maxLoopPerSection.get(sectionIndex) || 1;
+  }
+
+  playSection(section) {
+    this.clearTimeouts();
+    this.currentSection = section;
+    this.maxLoopPerSection.delete(section);
+
+    if (TESTING.TEST_MODE) {
+      setupTestPatterns(this.synths);
+      return;
+    }
+
+    muteAllAndClear(this.synths);
+
+    const { bassSeq, acidSeq, kickSeq, snareSeq, percSeq, techLeadSeq, techStabSeq, bassGain, kickGain, hatGain, acidGain, buildupGain, buildupNoise, buildupFilter, acid, bass, drumsMixer, filterLfo } = this.synths;
 
     switch (section) {
       case 0:
-        console.log("Section 0: Minimal start - Just bass and hats (2 loops)");
+        this.loop([1, 3, 5, 7], () => {
+          console.log("case 0 loop 1 3 5 7");
+          // bassSeq.mute = false;
+          // bassGain.gain.value = 1;
+          // bassSeq.events = bassPatterns[4];
+        });
 
-        bassSeq.events = bassPatterns[0];
-        kickSeq.events = kickPatterns[0];
-
-        acidSeq.mute = true;
-        kickSeq.mute = true;
-        snareSeq.mute = true;
-        percSeq.mute = true;
-
-        bassGain.gain.value = 0;
-        kickGain.gain.value = 0;
-        hatGain.gain.value = 0;
-
-        setTimeout(() => {
-          bassGain.gain.rampTo(0.5, 2);
-        }, 0);
-
-        setTimeout(() => {
-          hatGain.gain.rampTo(0.1, 2);
-        }, 3000);
-
-        setTimeout(() => {
-          kickSeq.mute = false;
-          kickGain.gain.rampTo(1.0, 2);
-        }, 7500);
-
-        setTimeout(() => {
-          bassSeq.mute = true;
-          kickSeq.mute = true;
-        }, 14000);
+        this.loop([2, 4, 8, 9], () => {
+          console.log("case 0 loop 2 4 8 9");
+        });
         break;
 
       case 1:
-        console.log("Section 1: Smooth Intro - Gradual buildup with acid introduction (4 loops)");
+        this.loop([1, 3, 5, 7], () => {
+          console.log("case 1 loop 1 3 5 7");
+        });
 
-        acidSeq.events = acidPatterns[0];
-
-        bassSeq.mute = false;
-        kickSeq.mute = false;
-        acidSeq.mute = false;
-
-        acidGain.gain.rampTo(0.4, 3);
-        acid.filter.Q.rampTo(15, 3);
-
-        setTimeout(() => {
-          acidSeq.mute = true;
-        }, 14500);
-
-        setTimeout(() => {
-          acidSeq.mute = false;
-        }, 15000);
-
-        setTimeout(() => {
-          acidSeq.mute = true;
-        }, 29500);
-
-        setTimeout(() => {
-          acidSeq.mute = false;
-        }, 30000);
+        this.loop([2, 4, 8], () => {
+          console.log("case 1 loop 2 4 8");
+        });
         break;
 
       case 2:
-        console.log("Section 2: Filter sweeps and acid variation (2 loops)");
-        acidSeq.mute = false;
-        acid.filter.Q.rampTo(15, 2);
-        // Access filterLfo from synths object
-        if (this.synths.filterLfo) {
-          this.synths.filterLfo.frequency.rampTo(0.5, 4);
-        }
-        acidSeq.events = acidPatterns[1];
-        acidGain.gain.rampTo(0.8, 2);
+        this.loop([1, 3, 5, 7], () => {
+          console.log("case 2 loop 1 3 5 7");
+        });
+
+        this.loop([2, 4, 8], () => {
+          console.log("case 2 loop 2 4 8");
+        });
         break;
 
       case 3:
-        console.log("Section 3: Bass variation and syncopation (2 loops)");
-        acid.filter.Q.rampTo(15, 1);
-        bassSeq.events = bassPatterns[1];
-        bass.filterEnvelope.octaves = 6;
-        bassGain.gain.rampTo(1.3, 2);
+        this.loop([1, 3, 5, 7], () => {
+          console.log("case 3 loop 1 3 5 7");
+        });
+
+        this.loop([2, 4, 8], () => {
+          console.log("case 3 loop 2 4 8");
+        });
         break;
 
       case 4:
-        console.log("Section 5: Buildup - accelerating kicks + noise swell (1 loop)");
-        acidSeq.mute = true;
-        bassGain.gain.rampTo(0.3, 0.5);
-        hatGain.gain.rampTo(0.05, 0.5);
-        snareSeq.mute = true;
+        this.loop([1, 3, 5, 7], () => {
+          console.log("case 4 loop 1 3 5 7");
+        });
 
-        buildupNoise.triggerAttack();
-        buildupGain.gain.rampTo(0.6, 4);
-        buildupFilter.frequency.rampTo(8000, 4);
-
-        setTimeout(() => (kickSeq.events = kickPatterns[4]), 0);
-        setTimeout(() => (kickSeq.events = kickPatterns[5]), 1000);
-        setTimeout(() => (kickSeq.events = kickPatterns[6]), 2000);
-        setTimeout(() => (kickSeq.events = kickPatterns[7]), 3000);
+        this.loop([2, 4, 8], () => {
+          console.log("case 4 loop 2 4 8");
+        });
         break;
 
       case 5:
-        console.log("Section 6: Intense buildup - faster drums + white noise crescendo (1 loop)");
+        this.loop([1, 3, 5, 7], () => {
+          console.log("case 5 loop 1 3 5 7");
+        });
 
-        buildupFilter.frequency.rampTo(12000, 2);
-        buildupGain.gain.rampTo(0.9, 2);
-        acidSeq.mute = true;
-
-        setTimeout(() => {
-          kickSeq.events = kickPatterns[8];
-        }, 500);
-
-        setTimeout(() => {
-          kickGain.gain.rampTo(2.2, 0.5);
-        }, 3000);
-
-        setTimeout(() => {
-          kickSeq.mute = true;
-          buildupGain.gain.rampTo(0, 0.5);
-        }, 6500);
+        this.loop([2, 4, 8], () => {
+          console.log("case 5 loop 2 4 8");
+        });
         break;
 
       case 6:
-        console.log("Section 7: Hard Techno Drop (1 loop)");
+        this.loop([1, 3, 5, 7], () => {
+          console.log("case 6 loop 1 3 5 7");
+        });
 
-        buildupNoise.triggerAttack();
-        acidSeq.mute = true;
-        bassSeq.mute = true;
-        kickSeq.mute = true;
-        drumsMixer.gain.value = 0;
-
-        setTimeout(() => {
-          buildupGain.gain.value = 1.2;
-          buildupGain.gain.rampTo(0, 7.5);
-        }, 500);
-
-        //
-        acid.filter.Q.rampTo(15, 2);
-        kickSeq.events = kickPatterns[1];
-        snareSeq.mute = false;
-        kickGain.gain.rampTo(1.8, 2);
-        //
+        this.loop([2, 4, 8], () => {
+          console.log("case 6 loop 2 4 8");
+        });
         break;
 
       case 7:
+        this.loop([1, 3, 5, 7], () => {
+          console.log("case 7 loop 1 3 5 7");
+        });
+
+        this.loop([2, 4, 8], () => {
+          console.log("case 7 loop 2 4 8");
+        });
         break;
 
       case 8:
+        this.loop([1, 3, 5, 7], () => {
+          console.log("case 8 loop 1 3 5 7");
+        });
+
+        this.loop([2, 4, 8], () => {
+          console.log("case 8 loop 2 4 8");
+        });
         break;
     }
   }
 
-  // BPM modulation logic
   updateBPM() {
     Tone.getTransport().bpm.rampTo(128 + Math.sin(Tone.getTransport().seconds * 0.1) * 8, 4);
   }

@@ -2,8 +2,10 @@ import * as Tone from "https://cdn.skypack.dev/tone@15.1.22";
 import { bassPatterns, acidPatterns, kickPatterns, techLeadPattern, techStabPattern, drumPatterns } from "./patterns/index.js";
 import { Controls } from "./controls.js";
 import { BeatManager } from "./beats.js";
-import { CONFIG, SYNTH_CONFIGS, GAIN_LEVELS, EFFECTS_CONFIG } from "./config.js";
+import { CONFIG, SYNTH_CONFIGS, GAIN_LEVELS, EFFECTS_CONFIG, autoStartIfEnabled, startTestMode } from "./config.js";
 import { setupVisualizers } from "./visualizers.js";
+import { TESTING } from "./testing.js";
+import { startPhaseMeter } from "./phaseMeter.js";
 
 const controls = new Controls();
 
@@ -187,24 +189,12 @@ const startAcid = async () => {
 
   controls.initializeSection();
   currentSection = controls.currentSection;
-  beatManager.updateProgression(currentSection);
 
-  new Tone.Loop((time) => {
-    progressionCount++;
-    loopsInCurrentSection++;
-
-    if (loopsInCurrentSection > controls.sectionLengths[currentSection]) {
-      currentSection = (currentSection + 1) % controls.sectionLengths.length;
-      loopsInCurrentSection = 1;
-      beatManager.updateProgression(currentSection);
-    }
-
-    console.log(`Loop ${progressionCount}: Section ${currentSection}, Loop ${loopsInCurrentSection}/${controls.sectionLengths[currentSection]}`);
-
-    beatManager.updateBPM();
-  }, "4m").start(0);
-
-  Tone.getTransport().start();
+  const startBeats = () => {
+    Tone.getTransport().start();
+    startPhaseMeter();
+    beatManager.playSection(currentSection);
+  };
 
   const analyzers = {
     master: masterAnalyser,
@@ -235,7 +225,29 @@ const startAcid = async () => {
 
   return {
     analyzers,
+    synthsAndSequences,
+    startBeats,
   };
 };
 
-controls.onStart(startAcid);
+const main = async () => {
+  const { synthsAndSequences, startBeats } = await startAcid();
+
+  if (TESTING.TEST_MODE) {
+    controls.onStart(() => {
+      Tone.getTransport().start();
+      startPhaseMeter();
+      startTestMode(synthsAndSequences);
+    });
+  } else {
+    controls.onStart(startBeats);
+  }
+
+  autoStartIfEnabled(startBeats, () => {
+    Tone.getTransport().start();
+    startPhaseMeter();
+    startTestMode(synthsAndSequences);
+  });
+};
+
+main();

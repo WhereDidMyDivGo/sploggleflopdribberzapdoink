@@ -1,3 +1,5 @@
+import * as Tone from "https://cdn.skypack.dev/tone@15.1.22";
+
 export const CONFIG = {
   BPM: 128,
   LOOP_LENGTH: "4m",
@@ -5,6 +7,7 @@ export const CONFIG = {
   REVERB_ROOM_SIZE: 1.2,
   COMPRESSOR_THRESHOLD: -12,
   COMPRESSOR_RATIO: 3,
+  LOOP_DURATION_MS: 7500,
 };
 
 export const SYNTH_CONFIGS = {
@@ -158,3 +161,60 @@ export const EFFECTS_CONFIG = {
     max: 1200,
   },
 };
+
+export function muteAllAndClear(synthsAndSequences) {
+  const { bassSeq, acidSeq, kickSeq, snareSeq, percSeq, techLeadSeq, techStabSeq, bassGain, kickGain, hatGain, acidGain, buildupGain, drumsMixer } = synthsAndSequences;
+
+  bassSeq.mute = true;
+  acidSeq.mute = true;
+  kickSeq.mute = true;
+  snareSeq.mute = true;
+  percSeq.mute = true;
+  techLeadSeq.mute = true;
+  techStabSeq.mute = true;
+
+  bassSeq.events = [];
+  acidSeq.events = [];
+  kickSeq.events = [];
+
+  bassGain.gain.cancelScheduledValues(Tone.now());
+  kickGain.gain.cancelScheduledValues(Tone.now());
+  hatGain.gain.cancelScheduledValues(Tone.now());
+  acidGain.gain.cancelScheduledValues(Tone.now());
+  buildupGain.gain.cancelScheduledValues(Tone.now());
+  drumsMixer.gain.cancelScheduledValues(Tone.now());
+
+  bassGain.gain.value = 0;
+  kickGain.gain.value = 0;
+  hatGain.gain.value = 0;
+  acidGain.gain.value = 0;
+  buildupGain.gain.value = 0;
+  drumsMixer.gain.value = 0;
+}
+
+export async function autoStartIfEnabled(startCallback, testStartCallback) {
+  const { TESTING } = await import("./testing.js");
+
+  if (TESTING.AUTO_START) {
+    console.log("=== AUTO START ON ===");
+    await Tone.start();
+
+    const startBtn = document.getElementById("start");
+    startBtn.disabled = true;
+
+    if (TESTING.TEST_MODE) {
+      testStartCallback();
+    } else {
+      startCallback();
+    }
+  }
+}
+
+export async function startTestMode(synthsAndSequences) {
+  Tone.getTransport().start();
+
+  console.log("=== TEST MODE ACTIVE ===");
+
+  const { setupTestPatterns } = await import("./testing.js");
+  setupTestPatterns(synthsAndSequences);
+}
