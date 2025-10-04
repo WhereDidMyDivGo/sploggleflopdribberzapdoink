@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>:)</title>
+    <link rel="icon" href="https://i1.sndcdn.com/artworks-000109700226-bnyild-t500x500.jpg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="./src/script.js"></script>
+  </head>
+  <body>
+    <button id="start">start beat</button>
+    <div class="visualizers">
+      <div class="viz-container">
+        <label>Master Mix • Waveform</label>
+        <canvas id="scope-master" width="400" height="120"></canvas>
+      </div>
+      <div class="viz-container">
+        <label>Kick • Frequency Bars</label>
+        <canvas id="scope-kick" width="400" height="120"></canvas>
+      </div>
+      <div class="viz-container">
+        <label>Bass • Horizontal Spectrum</label>
+        <canvas id="scope-bass" width="400" height="120"></canvas>
+      </div>
+      <div class="viz-container">
+        <label>Acid • Spectrogram</label>
+        <canvas id="scope-acid" width="400" height="120"></canvas>
+      </div>
+      <div class="viz-container">
+        <label>Drums • Waveform</label>
+        <canvas id="scope-drums" width="400" height="120"></canvas>
+      </div>
+    </div>
+  </body>
+</html>

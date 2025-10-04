@@ -1,0 +1,6 @@
+export const acidPatterns = [
+  [{ pitch: "C3", velocity: 0.8 }, null, { pitch: "Eb3", velocity: 0.6 }, { pitch: "F3", velocity: 0.7 }, { pitch: "G3", velocity: 0.9 }, null, { pitch: "F3", velocity: 0.5 }, null, { pitch: "Eb3", velocity: 0.6 }, { pitch: "C3", velocity: 0.8 }, null, { pitch: "F3", velocity: 0.7 }, { pitch: "C3", velocity: 0.8 }, null, null, null],
+  [{ pitch: "C3", velocity: 0.7 }, { pitch: "Eb3", velocity: 0.5 }, null, { pitch: "F3", velocity: 0.8 }, null, { pitch: "G3", velocity: 0.6 }, { pitch: "Ab3", velocity: 0.9 }, null, { pitch: "F3", velocity: 0.7 }, null, { pitch: "Eb3", velocity: 0.6 }, null, { pitch: "C3", velocity: 0.8 }, { pitch: "Bb2", velocity: 0.5 }, null, null],
+  [{ pitch: "C3", velocity: 0.4 }, null, null, null, { pitch: "Eb3", velocity: 0.3 }, null, null, null, { pitch: "F3", velocity: 0.5 }, null, null, null, { pitch: "C3", velocity: 0.4 }, null, null, null],
+  [{ pitch: "C3", velocity: 0.8 }, null, { pitch: "D3", velocity: 0.6 }, null, { pitch: "Eb3", velocity: 0.7 }, null, { pitch: "F3", velocity: 0.8 }, null, { pitch: "G3", velocity: 0.9 }, null, { pitch: "F3", velocity: 0.6 }, null, { pitch: "Eb3", velocity: 0.7 }, null, { pitch: "D3", velocity: 0.5 }, null],
+];
