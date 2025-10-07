@@ -3,12 +3,40 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>:)</title>
+    <title>Beat Machine</title>
     <link rel="icon" href="https://i1.sndcdn.com/artworks-000109700226-bnyild-t500x500.jpg" />
     <link rel="stylesheet" href="style.css" />
-    <script type="module" src="./src/script.js"></script>
+    <script src="./libs/Tone.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </head>
   <body>
+    <div class="controls-panel">
+      <div class="section-controls">
+        <button id="prev-section">← Prev</button>
+        <span id="section-display">Section 1: ...</span>
+        <button id="next-section">Next →</button>
+      </div>
+      <div class="bpm-controls">
+        <label>BPM: </label>
+        <button id="bpm-down">-</button>
+        <span id="bpm-display">0</span>
+        <button id="bpm-up">+</button>
+      </div>
+      <div class="volume-controls">
+        <label>Master: </label>
+        <input type="range" id="master-volume" min="-60" max="6" value="0" step="1" />
+      </div>
+    </div>
+
+    <button id="start">Start Beat</button>
+
+    <div class="visualizers">
+      <div class="viz-container">
+        <label>Master Mix • Waveform</label>
+        <canvas id="scope-master" width="400" height="120"></canvas>
+      </div>
+    </div>
+
     <div class="notes-container">
       <div class="phase-meter">
         <div class="full-notes-track">
@@ -17,29 +45,6 @@
         <div class="quarter-notes-track">
           <div class="quarter-notes-indicator"></div>
         </div>
-      </div>
-    </div>
-    <button id="start">start beat</button>
-    <div class="visualizers">
-      <div class="viz-container">
-        <label>Master Mix • Waveform</label>
-        <canvas id="scope-master" width="400" height="120"></canvas>
-      </div>
-      <div class="viz-container">
-        <label>Kick • Frequency Bars</label>
-        <canvas id="scope-kick" width="400" height="120"></canvas>
-      </div>
-      <div class="viz-container">
-        <label>Bass • Horizontal Spectrum</label>
-        <canvas id="scope-bass" width="400" height="120"></canvas>
-      </div>
-      <div class="viz-container">
-        <label>Acid • Spectrogram</label>
-        <canvas id="scope-acid" width="400" height="120"></canvas>
-      </div>
-      <div class="viz-container">
-        <label>Drums • Waveform</label>
-        <canvas id="scope-drums" width="400" height="120"></canvas>
       </div>
     </div>
   </body>

@@ -1,10 +1,14 @@
 export function drawWaveform(canvas, analyser, color = "#00ff88", name = "") {
+  if (!analyser || !canvas) return;
+
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
   const h = canvas.height;
 
   function draw() {
     requestAnimationFrame(draw);
+
+    if (!analyser) return;
     const data = analyser.getValue();
 
     ctx.fillStyle = "#001122";
@@ -57,6 +61,8 @@ export function drawWaveform(canvas, analyser, color = "#00ff88", name = "") {
 }
 
 export function drawFrequencyBars(canvas, analyser, color = "#ff4444", name = "") {
+  if (!analyser || !canvas) return;
+
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
   const h = canvas.height;
@@ -72,6 +78,7 @@ export function drawFrequencyBars(canvas, analyser, color = "#ff4444", name = ""
     }
     lastDrawTime = currentTime;
 
+    if (!analyser) return;
     const data = analyser.getValue();
 
     ctx.fillStyle = "#001122";
@@ -108,6 +115,8 @@ export function drawFrequencyBars(canvas, analyser, color = "#ff4444", name = ""
 }
 
 export function drawSpectrogram(canvas, analyser, color = "#ffaa00", name = "") {
+  if (!analyser || !canvas) return;
+
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
   const h = canvas.height;
@@ -127,6 +136,7 @@ export function drawSpectrogram(canvas, analyser, color = "#ffaa00", name = "") 
     }
     lastDrawTime = currentTime;
 
+    if (!analyser) return;
     const data = analyser.getValue();
 
     canvas.spectrogramData.push([...data]);
@@ -172,12 +182,16 @@ export function drawSpectrogram(canvas, analyser, color = "#ffaa00", name = "") 
 }
 
 export function drawHorizontalSpectrum(canvas, analyser, color = "#4444ff", name = "") {
+  if (!analyser || !canvas) return;
+
   const ctx = canvas.getContext("2d");
   const w = canvas.width;
   const h = canvas.height;
 
   function draw() {
     requestAnimationFrame(draw);
+
+    if (!analyser) return;
     const data = analyser.getValue();
 
     ctx.fillStyle = "#001122";
@@ -236,6 +250,10 @@ export function drawScope(canvas, analyser) {
 }
 
 export function setupVisualizers(analyzers) {
+  if (!analyzers || typeof analyzers !== "object") {
+    return;
+  }
+
   const visualizers = [
     { id: "scope-master", analyser: analyzers.master, color: "#00ff88", name: "Master", type: "waveform" },
     { id: "scope-kick", analyser: analyzers.kick, color: "#ff4444", name: "Kick", type: "spectrum" },
@@ -246,7 +264,7 @@ export function setupVisualizers(analyzers) {
 
   visualizers.forEach((viz) => {
     const canvas = document.getElementById(viz.id);
-    if (canvas) {
+    if (canvas && viz.analyser) {
       switch (viz.type) {
         case "bars":
           drawFrequencyBars(canvas, viz.analyser, viz.color, viz.name);
@@ -268,6 +286,5 @@ export function setupVisualizers(analyzers) {
   const legacyCanvas = document.getElementById("scope");
   if (legacyCanvas) {
     drawScope(legacyCanvas, analyzers.master);
-    console.log("Legacy scope visualization started");
   }
 }

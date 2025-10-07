@@ -12,4 +12,5 @@ export const bassPatterns = [
   ["C1", null, null, "G2", "C1", "Bb0", "Ab2", null, null, "C2", null, "G1", null, "Eb2", "F4", "C2"],
   ["C1", "C2", null, "G2", "C1", "Bb0", "Ab2", null, "C1", "C2", "F3", "G1", null, "Eb2", "F4", "C2"],
   ["C1", "C2", "F3", "G2", null, "Bb0", "Ab2", "F4", "C1", "C2", null, "G1", "Bb1", "Eb2", "F4", null],
+  [null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null],
 ];
